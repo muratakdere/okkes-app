@@ -1,22 +1,53 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
+// screens/Stok.tsx
+import React from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  FlatList, 
+  TouchableOpacity, 
+  Alert, 
+  SafeAreaView // SafeAreaView eklemek iyi bir pratiktir
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from '@expo/vector-icons';
 
+// --- YENİ: TİPLER ---
+// Bu tiplerin AppNavigator.tsx'deki ile AYNI olması gerekir.
+// Tüm ekranların ihtiyaç duyduğu BİRLEŞTİRİLMİŞ Product tipi:
+interface Product {
+  id: string; 
+  name: string;
+  price: number;  // Satış ve Gelir/Gider için
+  cost: number;   // Gelir/Gider için
+  quantity: number; // Stok için
+  unit: string;     // Stok için
+}
 
-const initialStok = [
-  { id: '1', name: 'Lahmacun', quantity: 50, unit: 'adet', price: 12 },
-  { id: '2', name: 'Kebap', quantity: 30, unit: 'adet', price: 45 },
-  { id: '3', name: 'Ayran', quantity: 100, unit: 'şişe', price: 5 },
-];
+// Bu bileşenin AppNavigator'dan alacağı prop'ları tanımlar
+interface StokProps {
+  products: Product[];
+  setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+}
+// --- BİTİŞ: TİPLER ---
 
-export default function Stok() {
-  const [stok, setStok] = useState(initialStok);
 
-  const renderItem = ({ item }: any) => (
+// --- YENİ: BİLEŞEN TANIMI ---
+// 'export default function Stok()' yerine prop'ları alacak bu yapıyı kullanıyoruz:
+const Stok: React.FC<StokProps> = ({ products, setProducts }) => {
+
+  // --- KALDIRILDI ---
+  // const initialStok = [...];
+  // const [stok, setStok] = useState(initialStok);
+  // Artık bu verilere gerek yok, çünkü prop'lardan geliyorlar.
+
+
+  // renderItem fonksiyonu 'item' tipini Product olarak güncelledi
+  const renderItem = ({ item }: { item: Product }) => (
     <LinearGradient colors={['#f5f6fa', '#dcdde1']} style={styles.card}>
       <View>
         <Text style={styles.itemName}>{item.name}</Text>
+        {/* Stok verilerini 'products' prop'undan okuyoruz */}
         <Text style={styles.itemDetails}>Miktar: {item.quantity} {item.unit}</Text>
         <Text style={styles.itemDetails}>Birim Fiyat: {item.price}₺</Text>
       </View>
@@ -37,17 +68,20 @@ export default function Stok() {
       "Bu ürünü silmek istiyor musunuz?",
       [
         { text: "İptal", style: "cancel" },
-        { text: "Sil", style: "destructive", onPress: () => setStok(prev => prev.filter(item => item.id !== id)) }
+        // --- GÜNCELLEME: 'setStok' yerine 'setProducts' kullanıyoruz ---
+        { text: "Sil", style: "destructive", onPress: () => setProducts(prev => prev.filter(item => item.id !== id)) }
       ]
     );
   };
 
   return (
-    <View style={styles.container}>
+    // SafeAreaView, ekranın çentik gibi alanlara taşmamasını sağlar
+    <SafeAreaView style={styles.container}> 
       <Text style={styles.title}>Stok Listesi</Text>
 
       <FlatList
-        data={stok}
+        // --- GÜNCELLEME: 'data={stok}' yerine 'data={products}' kullanıyoruz ---
+        data={products} 
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -59,12 +93,15 @@ export default function Stok() {
           <Text style={styles.addButtonText}>Yeni Ürün Ekle</Text>
         </LinearGradient>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
+// Stil kodlarınızda değişiklik yok, sadece container'dan padding'i aldım
+// ve SafeAreaView'e ekledim
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f0f3f5", padding: 20 },
+  container: { flex: 1, backgroundColor: "#f0f3f5" }, // Padding buradan alındı
+  safeArea: { flex: 1, backgroundColor: "#f0f3f5", padding: 20 }, // Padding buraya eklendi
   title: { fontSize: 26, fontWeight: "bold", color: "#e74c3c", marginBottom: 15, textAlign: "center" },
   card: { 
     padding: 15, 
@@ -87,3 +124,5 @@ const styles = StyleSheet.create({
   addButtonGradient: { flexDirection: "row", alignItems: "center", justifyContent: "center", padding: 14, borderRadius: 12 },
   addButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold", marginLeft: 8 },
 });
+
+export default Stok; // 'export default' sona eklendi

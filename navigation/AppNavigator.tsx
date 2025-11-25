@@ -1,16 +1,16 @@
-import React, { useContext } from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 
 // Ekranlar
-import Login from "@/screens/Login";
-import Register from "@/screens/Register";
-import ForgotPassword from "@/screens/ForgotPassword";
 import Dashboard from "@/screens/Dashboard";
-import Stok from "@/screens/Stok";
+import ForgotPassword from "@/screens/ForgotPassword";
 import GelirGider from "@/screens/GelirGider";
+import Login from "@/screens/Login";
 import Profile from "@/screens/Profil";
+import Register from "@/screens/Register";
+import Stok from "@/screens/Stok";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
